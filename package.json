@@ -1,0 +1,43 @@
+{
+  "name": "ame-watcher",
+  "version": "0.0.1",
+  "description": "REST API to retrieve Adobe Media Encoder's status",
+  "main": "index.js",
+  "scripts": {
+    "lint": "xo",
+    "dev": "npm run lint && node ./bin/cli.js",
+    "start": "forever start -o server.log -e error.log ./bin/cli.js",
+    "stop": "forever stop ./bin/cli.js"
+  },
+  "keywords": [
+    "Adobe Media Encoder"
+  ],
+  "author": "Kuu Miyazaki",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "~1.17.1",
+    "config": "^1.26.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "express": "~4.15.2",
+    "forever": "^0.15.3",
+    "morgan": "~1.8.1"
+  },
+  "devDependencies": {
+    "xo": "^0.18.2"
+  },
+  "xo": {
+    "esnext": true,
+    "space": true,
+    "rules": {
+      "capitalized-comments": 0,
+      "dot-notation": 0,
+      "new-cap": 0,
+      "no-cond-assign": 0,
+      "no-mixed-operators": 0,
+      "no-multi-assign": 0,
+      "import/no-dynamic-require": 0,
+      "unicorn/filename-case": 0
+    }
+  }
+}
