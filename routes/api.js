@@ -5,9 +5,9 @@ const express = require('express');
 const debug = require('debug')('ame-watcher');
 
 const router = express.Router();
-const WATCH_FOLDER = process.env.WATCH_FOLDER || config.path.watchFolder || process.cwd();
-const LOG_FILE = process.env.LOG_FILE || config.path.logFile || '8.0';
-const LOG_LANG = process.env.LOG_LANG || config.log.lang || 'ja';
+const WATCH_FOLDER = process.env.WATCH_FOLDER || (config.path && config.path.watchFolder) || process.cwd();
+const LOG_FILE = process.env.LOG_FILE || (config.path && config.path.logFile) || '8.0';
+const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'ja';
 
 const constants = require(`../constants/${LOG_LANG}`);
 

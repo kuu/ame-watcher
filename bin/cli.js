@@ -23,10 +23,14 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
+if (!config.path) {
+  throw new Error('Config file is not set properly');
+}
+
 const WATCH_FOLDER = process.env.WATCH_FOLDER || config.path.watchFolder || process.cwd();
 const LOG_FILE = process.env.LOG_FILE || config.path.logFile;
-const LOG_VERSION = process.env.LOG_VERSION || config.log.version || '8.0';
-const LOG_LANG = process.env.LOG_LANG || config.log.lang || 'ja';
+const LOG_VERSION = process.env.LOG_VERSION || (config.log && config.log.version) || '8.0';
+const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'ja';
 
 if (!fs.existsSync(WATCH_FOLDER)) {
   throw new Error('Invalid WATCH_FOLDER');
