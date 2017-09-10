@@ -1,3 +1,8 @@
+[![NPM version](https://badge.fury.io/js/ame-watcher.png)](https://badge.fury.io/js/ame-watcher)
+[![Build Status](https://travis-ci.org/kuu/ame-watcher.svg?branch=master)](https://travis-ci.org/kuu/ame-watcher)
+[![Coverage Status](https://coveralls.io/repos/kuu/ame-watcher/badge.png?branch=master)](https://coveralls.io/r/kuu/ame-watcher?branch=master)
+[![Dependency Status](https://gemnasium.com/kuu/ame-watcher.png)](https://gemnasium.com/kuu/ame-watcher)
+
 # ame-watcher
 REST API to retrieve Adobe Media Encoder's status
 
