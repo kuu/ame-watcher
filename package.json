@@ -7,7 +7,8 @@
     "lint": "xo",
     "dev": "npm run lint && node ./bin/cli.js",
     "start": "forever start -o server.log -e error.log ./bin/cli.js",
-    "stop": "forever stop ./bin/cli.js"
+    "stop": "forever stop ./bin/cli.js",
+    "debug": "node-debug ./bin/cli.js --debug-brk"
   },
   "keywords": [
     "Adobe Media Encoder"

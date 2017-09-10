@@ -1,6 +1,15 @@
 # ame-watcher
 REST API to retrieve Adobe Media Encoder's status
 
+## APIs
+| Method | Path                   | Description   | Request Params | Response JSON Format  |
+| ------ | ---------------------- | ------------- | ------------- | ------------- |
+| GET    | /api/queue             | Returns the number of files in watch-folder | - |  {num: `number of files`} |
+| GET    | /api/logs/:num          | Returns the last {`num`} log entries in reverse chronological order | `num` must be an integer between 1 to 128 | [{state: `"started"/"stopped"/"paused"/"resumed"/"success"/"failed"`, date: `datetime of the log entry`}] |
+| GET    | /api/encode/:file-name | Moves one file in master-folder to watch-folder | `file-name` cannot contain '/' | - |
+* watch-folder must be registered as AME's watch folder
+* master-folder must be on the same file system with watch-folder
+
 ## Install
 * Install [Node.js](https://nodejs.org/)
 * Clone source code and install dependencies
@@ -19,12 +28,16 @@ $ npm install
  $ vi config/default.json
  {
    "path": {
+     "masterFolder": "/path/to/master-folder",
      "watchFolder": "/path/to/watch-folder",
      "logFile":     "/path/to/log-file"
+   },
+   "log": {
+     "lang": "ja"
    }
  }
 ```
-* Only 8.0 log version is supported.
+* Supported log file languages are "en" and "ja" (default = "en")
 
 ## Run
 * Start the server with specifying port number (the default port is 3000)
@@ -33,21 +46,21 @@ $ npm install
 $ PORT={port number} npm start
 ```
 
-* Now you can access `/api/queue` and `/api/encoder`
+* Now you can access the APIs
 
 ```
 $ curl http://localhost:3000/api/queue
 {"num":0}
 
-$ curl http://localhost:3000/api/encoder
-{
-  "curr": {
-    "state": "started", date: "2017-09-06T08:23:43.000Z"
-  },
-  "prev": {
-    "state": "success", date: "2017-09-06T08:24:05.000Z"
-  }
-}
+$ curl http://localhost:3000/api/log/3
+[
+  {"state": "success", date: "2017-09-06T08:24:05.000Z"},
+  {"state": "started", date: "2017-09-06T08:23:43.000Z"},
+  {"state": "failed",  date: "2017-09-06T08:22:30.000Z"}
+]
+
+$ curl http://localhost:3000/api/encode/ame%20test.mp4
+
 ```
 * Timezone is UTC
 * Use DEBUG environ variable for detail logs
@@ -56,7 +69,7 @@ $ DEBUG=ame-watcher npm start
 ```
 
 ## Stop
-* Run the following command in the same directory
+* Stop the server (not AME) by the following command in the same directory you did `npm start`
 
 ```
 $ npm stop

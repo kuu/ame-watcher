@@ -27,21 +27,25 @@ if (!config.path) {
   throw new Error('Config file is not set properly');
 }
 
+const MASTER_FOLDER = process.env.MASTER_FOLDER || (config.path && config.path.masterFolder) || process.cwd();
 const WATCH_FOLDER = process.env.WATCH_FOLDER || config.path.watchFolder || process.cwd();
 const LOG_FILE = process.env.LOG_FILE || config.path.logFile;
-const LOG_VERSION = process.env.LOG_VERSION || (config.log && config.log.version) || '8.0';
-const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'ja';
+const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'en';
+
+if (!fs.existsSync(MASTER_FOLDER)) {
+  throw new Error('Invalid MASTER_FOLDER');
+}
 
 if (!fs.existsSync(WATCH_FOLDER)) {
   throw new Error('Invalid WATCH_FOLDER');
 }
 
-if (!fs.existsSync(LOG_FILE)) {
-  throw new Error('Invalid LOG_FILE');
+if (MASTER_FOLDER === WATCH_FOLDER) {
+  throw new Error('MASTER_FOLDER is the same as WATCH_FOLDER');
 }
 
-if (LOG_VERSION !== '8.0') {
-  throw new Error(`Log version: ${LOG_VERSION} is not supported`);
+if (!fs.existsSync(LOG_FILE)) {
+  throw new Error('Invalid LOG_FILE');
 }
 
 if (!fs.existsSync(path.join(__dirname, '..', 'constants', `${LOG_LANG}.js`))) {
@@ -109,5 +113,5 @@ function onError(error) {
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  debug(`Server started. port=${bind}, WATCH_FOLDER=${WATCH_FOLDER}, LOG_FILE=${LOG_FILE}`);
+  debug(`Server started. port=${bind}, MASTER_FOLDER=${MASTER_FOLDER}, WATCH_FOLDER=${WATCH_FOLDER}, LOG_FILE=${LOG_FILE}`);
 }

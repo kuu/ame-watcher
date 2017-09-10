@@ -3,13 +3,13 @@ const path = require('path');
 const config = require('config');
 const express = require('express');
 const debug = require('debug')('ame-watcher');
+const {parse} = require('../libs/log');
 
 const router = express.Router();
+const MASTER_FOLDER = process.env.MASTER_FOLDER || (config.path && config.path.masterFolder) || process.cwd();
 const WATCH_FOLDER = process.env.WATCH_FOLDER || (config.path && config.path.watchFolder) || process.cwd();
 const LOG_FILE = process.env.LOG_FILE || (config.path && config.path.logFile) || '8.0';
-const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'ja';
-
-const constants = require(`../constants/${LOG_LANG}`);
+const MAX_LOG_ENTRY = 128;
 
 /* GET the number of files in the watch folder. */
 router.get('/queue', (_, res) => {
@@ -23,79 +23,44 @@ router.get('/queue', (_, res) => {
   res.json({num: fileList.length});
 });
 
-/* GET the current and previous state of the encoder. */
-router.get('/encoder', (_, res) => {
+/* GET the last {num} log entries in reverse chronological order */
+router.get('/logs/:num', (req, res) => {
+  const num = Number.parseInt(req.params.num, 10);
+  if (Number.isNaN(num) || num <= 0 || num > MAX_LOG_ENTRY) {
+    res.status(400);
+    return res.send(`"num" should be an integer between 1 to ${MAX_LOG_ENTRY}`);
+  }
   fs.readFile(LOG_FILE, (err, buf) => {
     if (err) {
       res.status(err.status || 500);
       return res.send(err.stack);
     }
-    const result = parse(buf.toString('utf16le'));
-    if (!result) {
-      res.status(500);
-      return res.send('No log available');
-    }
+    const result = parse(buf.toString('utf16le'), num);
     res.json(result);
   });
 });
 
-function parse(file) {
-  const lines = file.split('\n');
-  lines.reverse();
-  const lastTwo = [];
-  for (const line of lines) {
-    const stateObj = readLine(line);
-    if (!stateObj) {
-      continue;
+/* Moves the specified file in master-folder to watch-folder */
+router.get('/encode/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  if (!fileName) {
+    res.status(400);
+    return res.send('File is not specified');
+  }
+  if (fileName.includes('/')) {
+    res.status(400);
+    return res.send('File name cannot contain "/"');
+  }
+  const oldPath = path.join(MASTER_FOLDER, fileName);
+  const newPath = path.join(WATCH_FOLDER, fileName);
+  fs.rename(oldPath, newPath, err => {
+    if (err) {
+      res.status(err.status || 500);
+      return res.send(`Unable to move the specified file ("${fileName}")`);
     }
-    lastTwo.push(stateObj);
-    if (lastTwo.length === 2) {
-      return {
-        prev: lastTwo.pop(),
-        last: lastTwo.pop()
-      };
-    }
-  }
-  return null;
-}
-
-function readLine(line) {
-  const delim = ' : ';
-  const idx = line.indexOf(delim);
-  if (idx === -1) {
-    return null;
-  }
-  const date = readDate(line.slice(0, idx));
-  if (!date) {
-    return null;
-  }
-  const state = readState(line.slice(idx + delim.length));
-  if (!state) {
-    return null;
-  }
-  return {state, date};
-}
-
-function readDate(str) {
-  let date;
-  try {
-    date = new Date(str);
-  } catch (err) {
-    return null;
-  }
-  return date;
-}
-
-function readState(str) {
-  if (str === constants.ENCODE_STARTED) {
-    return 'started';
-  } else if (str === constants.STOPPED) {
-    return null;
-  } else if (str === constants.ENCODE_SUCCESS) {
-    return 'success';
-  } else if (str === constants.ENCODE_FAILED) {
-    return 'failed';
-  }
-}
+    res.status(200);
+    res.send('');
+  });
+});
 
 module.exports = router;
