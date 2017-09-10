@@ -21,7 +21,7 @@
     "body-parser": "~1.17.1",
     "config": "^1.26.2",
     "cookie-parser": "~1.4.3",
-    "debug": "~2.6.3",
+    "debug": "^3.0.1",
     "express": "~4.15.2",
     "forever": "^0.15.3",
     "morgan": "~1.8.1"
