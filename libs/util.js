@@ -1,10 +1,6 @@
 const path = require('path');
 const config = require('config');
 
-if (!config.path) {
-  throw new Error('Config file is not set properly');
-}
-
 function getConfig() {
   return {
     path: {
