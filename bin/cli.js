@@ -6,9 +6,11 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
-const config = require('config');
 const debug = require('debug')('ame-watcher');
 const app = require('../app');
+const util = require('../libs/util');
+
+const config = util.getConfig();
 
 /**
  * Get port from environment and store in Express.
@@ -23,14 +25,10 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-if (!config.path) {
-  throw new Error('Config file is not set properly');
-}
-
-const MASTER_FOLDER = process.env.MASTER_FOLDER || (config.path && config.path.masterFolder) || process.cwd();
-const WATCH_FOLDER = process.env.WATCH_FOLDER || config.path.watchFolder || process.cwd();
-const LOG_FILE = process.env.LOG_FILE || config.path.logFile;
-const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'en';
+const MASTER_FOLDER = config.path.masterFolder;
+const WATCH_FOLDER = config.path.watchFolder;
+const LOG_FILE = config.path.logFile;
+const LOG_LANG = config.log.lang;
 
 if (!fs.existsSync(MASTER_FOLDER)) {
   throw new Error('Invalid MASTER_FOLDER');

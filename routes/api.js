@@ -1,14 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const config = require('config');
 const express = require('express');
 const debug = require('debug')('ame-watcher');
 const {parse} = require('../libs/log');
+const util = require('../libs/util');
 
 const router = express.Router();
-const MASTER_FOLDER = process.env.MASTER_FOLDER || (config.path && config.path.masterFolder) || process.cwd();
-const WATCH_FOLDER = process.env.WATCH_FOLDER || (config.path && config.path.watchFolder) || process.cwd();
-const LOG_FILE = process.env.LOG_FILE || (config.path && config.path.logFile) || '8.0';
+const config = util.getConfig();
+const MASTER_FOLDER = config.path.masterFolder;
+const WATCH_FOLDER = config.path.watchFolder;
+const LOG_FILE = config.path.logFile;
 const MAX_LOG_ENTRY = 128;
 
 /* GET the number of files in the watch folder. */
@@ -43,15 +44,15 @@ router.get('/logs/:num', (req, res) => {
 /* Moves the specified file in master-folder to watch-folder */
 router.get('/encode/:fileName', (req, res) => {
   const fileName = req.params.fileName;
-  if (!fileName) {
-    res.status(400);
-    return res.send('File is not specified');
-  }
   if (fileName.includes('/')) {
     res.status(400);
     return res.send('File name cannot contain "/"');
   }
   const oldPath = path.join(MASTER_FOLDER, fileName);
+  if (!fs.existsSync(oldPath)) {
+    res.status(400);
+    return res.send('File does not exist');
+  }
   const newPath = path.join(WATCH_FOLDER, fileName);
   fs.rename(oldPath, newPath, err => {
     if (err) {

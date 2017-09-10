@@ -8,7 +8,9 @@
     "dev": "npm run lint && node ./bin/cli.js",
     "start": "forever start -o server.log -e error.log ./bin/cli.js",
     "stop": "forever stop ./bin/cli.js",
-    "debug": "node-debug ./bin/cli.js --debug-brk"
+    "debug": "node-debug ./bin/cli.js --debug-brk",
+    "test": "npm run lint && nsp check && ava --verbose",
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
     "Adobe Media Encoder"
@@ -25,6 +27,12 @@
     "morgan": "~1.8.1"
   },
   "devDependencies": {
+    "ava": "^0.22.0",
+    "coveralls": "^2.13.1",
+    "nsp": "^2.8.0",
+    "nyc": "^11.2.1",
+    "proxyquire": "^1.8.0",
+    "supertest": "^3.0.0",
     "xo": "^0.18.2"
   },
   "xo": {

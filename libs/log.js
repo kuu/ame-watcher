@@ -1,6 +1,7 @@
-const config = require('config');
+const util = require('./util');
 
-const LOG_LANG = process.env.LOG_LANG || (config.log && config.log.lang) || 'ja';
+const config = util.getConfig();
+const LOG_LANG = config.log.lang;
 const constants = require(`../constants/${LOG_LANG}`);
 
 function parse(file, num) {
