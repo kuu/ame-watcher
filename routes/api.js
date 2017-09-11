@@ -17,6 +17,10 @@ router.get('/queue', (_, res) => {
   debug('--- the files in the watch folder:');
   const fileList = fs.readdirSync(WATCH_FOLDER).filter(file => {
     const isFile = fs.statSync(path.join(WATCH_FOLDER, file)).isFile();
+    if (isFile && file.startsWith('.')) {
+      // Ignore dot files
+      return false;
+    }
     debug(`${file} (${isFile ? 'file' : 'dir'})`);
     return isFile;
   });
