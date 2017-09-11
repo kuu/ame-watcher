@@ -35,7 +35,7 @@ function readLine(line) {
   if (!state) {
     return null;
   }
-  return {state, date};
+  return {state, date: date.toTimeString()};
 }
 
 function readDate(str) {
