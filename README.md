@@ -57,7 +57,7 @@ $ PORT={port number} npm start
 $ curl http://localhost:3000/api/queue
 {"num":0}
 
-$ curl http://localhost:3000/api/log/3
+$ curl http://localhost:3000/api/logs/3
 [
   {"state": "success", date: "2017-09-06T08:24:05.000Z"},
   {"state": "started", date: "2017-09-06T08:23:43.000Z"},
