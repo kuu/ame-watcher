@@ -9,7 +9,8 @@
     "start": "forever start -o server.log -e error.log ./bin/cli.js",
     "stop": "forever stop ./bin/cli.js",
     "debug": "node-debug ./bin/cli.js --debug-brk",
-    "test": "npm run lint && nsp check && ava --verbose",
+    "test": "npm run lint && ava --verbose",
+    "security": "nsp check",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
@@ -18,22 +19,22 @@
   "author": "Kuu Miyazaki",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "~1.17.1",
-    "config": "^1.26.2",
-    "cookie-parser": "~1.4.3",
-    "debug": "^3.0.1",
-    "express": "~4.15.2",
+    "body-parser": "^1.18.2",
+    "config": "^1.30.0",
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.1.0",
+    "express": "^4.16.3",
     "forever": "^0.15.3",
-    "morgan": "~1.8.1"
+    "morgan": "^1.9.0"
   },
   "devDependencies": {
-    "ava": "^0.22.0",
-    "coveralls": "^2.13.1",
-    "nsp": "^2.8.0",
-    "nyc": "^11.2.1",
-    "proxyquire": "^1.8.0",
+    "ava": "^0.25.0",
+    "coveralls": "^3.0.0",
+    "nsp": "^3.2.1",
+    "nyc": "^11.6.0",
+    "proxyquire": "^2.0.1",
     "supertest": "^3.0.0",
-    "xo": "^0.18.2"
+    "xo": "^0.20.3"
   },
   "xo": {
     "esnext": true,

@@ -51,17 +51,23 @@ function readDate(str) {
 function readState(str) {
   if (str === constants.ENCODE_STARTED) {
     return 'started';
-  } else if (str === constants.ENCODE_STOPPED) {
+  }
+  if (str === constants.ENCODE_STOPPED) {
     return 'stopped';
-  } else if (str === constants.ENCODE_PAUSED) {
+  }
+  if (str === constants.ENCODE_PAUSED) {
     return 'paused';
-  } else if (str === constants.ENCODE_RESUMED) {
+  }
+  if (str === constants.ENCODE_RESUMED) {
     return 'resumed';
-  } else if (str === constants.ENCODE_SUCCESS) {
+  }
+  if (str === constants.ENCODE_SUCCESS) {
     return 'success';
-  } else if (str === constants.ENCODE_FAILED) {
+  }
+  if (str === constants.ENCODE_FAILED) {
     return 'failed';
   }
+  return null;
 }
 
 exports.parse = parse;
