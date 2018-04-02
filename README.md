@@ -7,11 +7,11 @@
 REST API to retrieve Adobe Media Encoder's status
 
 ## APIs
-| Method | Path                   | Description   | Request Params | Response JSON Format  |
-| ------ | ---------------------- | ------------- | ------------- | ------------- |
-| GET    | /api/queue             | Returns the number of files in watch-folder | - |  {num: `number of files`} |
-| GET    | /api/logs/:num          | Returns the last {`num`} log entries in reverse chronological order | `num` must be an integer between 1 to 128 | [{state: `"started"/"stopped"/"paused"/"resumed"/"success"/"failed"`, date: `datetime of the log entry`}] |
-| GET    | /api/encode/:file-name | Moves one file in master-folder to watch-folder | `file-name` cannot contain '/' | - |
+| Method | Path                   | Description   | Request Params | Query Strings | Response JSON Format  |
+| ------ | ---------------------- | ------------- | ------------- | ------------- | ------------- |
+| GET    | /api/queue             | Returns the number of files in watch-folder | - | - |  {num: `number of files`} |
+| GET    | /api/logs/:num          | Returns the last {`num`} log entries in reverse chronological order | `num` must be an integer between 1 to 128 | - | [{state: `"started"/"stopped"/"paused"/"resumed"/"success"/"failed"`, date: `datetime of the log entry`}] |
+| GET    | /api/encode/:file-name | Moves one file in master-folder to watch-folder | `file-name` cannot contain '/' | `copy`: Set `true` if you don't want to move the master file (default=`false`) | - |
 * watch-folder must be registered as AME's watch folder
 * master-folder must be on the same file system with watch-folder
 
