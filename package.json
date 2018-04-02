@@ -33,6 +33,7 @@
     "nsp": "^3.2.1",
     "nyc": "^11.6.0",
     "proxyquire": "^2.0.1",
+    "rewire": "^3.0.2",
     "supertest": "^3.0.0",
     "xo": "^0.20.3"
   },
@@ -46,6 +47,7 @@
       "no-cond-assign": 0,
       "no-mixed-operators": 0,
       "no-multi-assign": 0,
+      "no-template-curly-in-string": 0,
       "import/no-dynamic-require": 0,
       "unicorn/filename-case": 0
     }

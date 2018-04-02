@@ -9,7 +9,9 @@ const router = express.Router();
 const config = util.getConfig();
 const MASTER_FOLDER = config.path.masterFolder;
 const WATCH_FOLDER = config.path.watchFolder;
+const OUTPUT_FOLDER = config.path.outputFolder;
 const LOG_FILE = config.path.logFile;
+const renameRules = config.renameRules;
 const MAX_LOG_ENTRY = 128;
 
 /* GET the number of files in the watch folder. */
@@ -66,6 +68,72 @@ router.get('/encode/:fileName', (req, res) => {
     }
     res.status(200);
     res.send('');
+  });
+});
+
+/* Rename the output files based on the `renameRules` defined in the config file and move the files to the `outputFolder` if defined */
+router.get('/rename', (_, res) => {
+  if (!fs.statSync(OUTPUT_FOLDER).isDirectory()) {
+    res.status(400);
+    return res.send(`outputFolder is not configured`);
+  }
+
+  const DEFAULT_OUTPUT_FOLDER = path.join(WATCH_FOLDER, 'Output');
+  if (!fs.statSync(DEFAULT_OUTPUT_FOLDER).isDirectory()) {
+    res.status(500);
+    return res.send(`Unable to find the system output directory`);
+  }
+
+  debug('--- the files in the system output directory:');
+  const fileList = fs.readdirSync(DEFAULT_OUTPUT_FOLDER).filter(file => {
+    const isFile = fs.statSync(path.join(DEFAULT_OUTPUT_FOLDER, file)).isFile();
+    if (isFile && file.startsWith('.')) {
+      // Ignore dot files
+      return false;
+    }
+    debug(`${file} (${isFile ? 'file' : 'dir'})`);
+    return isFile;
+  });
+  debug('---');
+
+  debug('--- rename list:');
+  const paramList = [];
+  for (const file of fileList) {
+    const oldPath = path.join(DEFAULT_OUTPUT_FOLDER, file);
+    const extension = path.extname(file);
+    const filename = path.basename(file, extension);
+    debug(`\toldPath: "${oldPath}"`);
+    if (renameRules.length === 0) {
+      debug(`\tnewPath: "${path.join(OUTPUT_FOLDER, file)}"`);
+      paramList.push({
+        oldPath,
+        newPath: path.join(OUTPUT_FOLDER, file)
+      });
+      continue;
+    }
+    for (const [i, rule] of renameRules.entries()) {
+      const destFileName = rule.replace('${filename}', filename).replace('${extension}', extension.slice(1));
+      const newPath = path.join(OUTPUT_FOLDER, destFileName);
+      debug(`\tnewPath: "${newPath}"`);
+      if (i === fileList.length - 1) {
+        paramList.push({oldPath, newPath});
+      } else {
+        paramList.push({oldPath, newPath, params: {copy: true}});
+        debug('\tparams: {copy: true}');
+      }
+    }
+    debug('---');
+  }
+
+  debug(`paramList.length = ${paramList.length}`);
+
+  util.renameList(paramList, err => {
+    if (err) {
+      res.status(err.status || 500);
+      return res.send(`Unable to rename ${fileList.length} files`);
+    }
+    res.status(200);
+    return res.send('');
   });
 });
 
