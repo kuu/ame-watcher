@@ -1,6 +1,6 @@
 {
   "name": "ame-watcher",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "REST API to retrieve Adobe Media Encoder's status",
   "main": "index.js",
   "scripts": {
