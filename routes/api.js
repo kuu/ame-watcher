@@ -58,7 +58,8 @@ router.get('/encode/:fileName', (req, res) => {
     return res.send('File does not exist');
   }
   const newPath = path.join(WATCH_FOLDER, fileName);
-  util.rename(oldPath, newPath, err => {
+  const copy = req.query.copy === 'true';
+  util.rename(oldPath, newPath, {copy}, err => {
     if (err) {
       res.status(err.status || 500);
       return res.send(`Unable to move the specified file ("${fileName}")`);
