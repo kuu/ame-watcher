@@ -18,7 +18,7 @@ test('encode:invalid-filename', async t => {
   t.is(res.status, 400);
 });
 
-test('encode:non-existing-filename', async t => {
+test('encode:no-existing-filename', async t => {
   const mockFs = {
     existsSync: () => {
       return false;
@@ -34,19 +34,21 @@ test('encode:move-error', async t => {
   const mockFs = {
     existsSync: () => {
       return true;
-    },
-    rename: (oldPath, newPath, callback) => {
+    }
+  };
+  const mockUtil = {
+    rename: (oldPath, newPath, params, callback) => {
       process.nextTick(() => {
         callback({});
       });
     }
   };
-  const mockApi = proxyquire('../../routes/api', {fs: mockFs});
+  const mockApi = proxyquire('../../routes/api', {'../libs/util': mockUtil, fs: mockFs});
   const app = proxyquire('../../app', {'./routes/api': mockApi});
   const res = await request(app).get('/api/encode/error.mp4');
   t.is(res.status, 500);
 });
-/*
+
 test('encode:move-success', async t => {
   const mockFs = {
     existsSync: () => {
@@ -54,15 +56,36 @@ test('encode:move-success', async t => {
     }
   };
   const mockUtil = {
-    rename: (oldPath, newPath, callback) => {
+    rename: (oldPath, newPath, params, callback) => {
       process.nextTick(() => {
         callback(null);
       });
     }
   };
-  const mockApi = proxyquire('../../routes/api', {util: mockUtil, fs: mockFs});
+  const mockApi = proxyquire('../../routes/api', {'../libs/util': mockUtil, fs: mockFs});
   const app = proxyquire('../../app', {'./routes/api': mockApi});
   const res = await request(app).get('/api/encode/success.mp4');
   t.is(res.status, 200);
 });
-*/
+
+test('encode:copy-flag', async t => {
+  let passedParams = null;
+  const mockFs = {
+    existsSync: () => {
+      return true;
+    }
+  };
+  const mockUtil = {
+    rename: (oldPath, newPath, params, callback) => {
+      passedParams = params;
+      process.nextTick(() => {
+        callback({});
+      });
+    }
+  };
+  const mockApi = proxyquire('../../routes/api', {'../libs/util': mockUtil, fs: mockFs});
+  const app = proxyquire('../../app', {'./routes/api': mockApi});
+  await request(app).get('/api/encode/error.mp4?copy=true');
+  t.truthy(passedParams);
+  t.is(passedParams.copy, true);
+});

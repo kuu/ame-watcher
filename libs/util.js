@@ -16,7 +16,16 @@ function getConfig() {
   };
 }
 
-function rename(oldPath, newPath, callback) {
+function rename(oldPath, newPath, ...remainings) {
+  let params;
+  let callback;
+  if (typeof remainings[0] === 'function') {
+    params = {};
+    callback = remainings[0];
+  } else {
+    params = remainings[0];
+    callback = remainings[1];
+  }
   fs.readFile(oldPath, (err, data) => {
     if (err) {
       debug(err.stack);
@@ -26,6 +35,9 @@ function rename(oldPath, newPath, callback) {
       if (err) {
         debug(err.stack);
         return callback(err);
+      }
+      if (params.copy) {
+        return callback(null);
       }
       // Delete the file
       fs.unlink(oldPath, err => {
