@@ -41,6 +41,7 @@
     "esnext": true,
     "space": true,
     "rules": {
+      "ava/prefer-async-await": 0,
       "capitalized-comments": 0,
       "dot-notation": 0,
       "new-cap": 0,
