@@ -14,6 +14,8 @@ const LOG_FILE = config.path.logFile;
 const renameRules = config.renameRules;
 const MAX_LOG_ENTRY = 128;
 
+let __renaming__ = false;
+
 /* GET the number of files in the watch folder. */
 router.get('/queue', (_, res) => {
   debug('--- the files in the watch folder:');
@@ -74,7 +76,7 @@ router.get('/encode/:fileName', (req, res) => {
 /* Rename the output files based on the `renameRules` defined in the config file and move the files to the `outputFolder` if defined */
 router.get('/rename', (_, res) => {
   if (!fs.statSync(OUTPUT_FOLDER).isDirectory()) {
-    res.status(400);
+    res.status(500);
     return res.send(`outputFolder is not configured`);
   }
 
@@ -95,6 +97,18 @@ router.get('/rename', (_, res) => {
     return isFile;
   });
   debug('---');
+
+  if (fileList.length === 0) {
+    res.status(200);
+    return res.send(`There's no file to process`);
+  }
+
+  if (__renaming__) {
+    res.status(500);
+    return res.send(`Unable to accept your request`);
+  }
+
+  __renaming__ = true;
 
   debug('--- rename list:');
   const paramList = [];
@@ -128,6 +142,7 @@ router.get('/rename', (_, res) => {
   debug(`paramList.length = ${paramList.length}`);
 
   util.renameList(paramList, err => {
+    __renaming__ = false;
     if (err) {
       res.status(err.status || 500);
       return res.send(`Unable to rename ${fileList.length} files`);
